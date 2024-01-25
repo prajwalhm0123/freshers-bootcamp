@@ -12,62 +12,74 @@ namespace codeBugFix1
         void Scan(string path);
     }
 
+    public class Device
+    {
+        public void Operation(string operationType, string path)
+        {
+            Console.WriteLine($"{operationType} .....{path}");
+        }
+    }
+
     public class Printer : IPrinter
     {
-        public void Print(string path)
+        private readonly Device device;
+
+        public Printer(Device device)
         {
-            Console.WriteLine($"Printing .....{path}");
+            this.device = device;
         }
+
+        public void Print(string path) => device.Operation("Printing", path);
     }
 
     public class Scanner : IScanner
     {
-        public void Scan(string path)
+        private readonly Device device;
+
+        public Scanner(Device device)
         {
-            Console.WriteLine($"Scanning .....{path}");
+            this.device = device;
         }
+
+        public void Scan(string path) => device.Operation("Scanning", path);
     }
 
     public class PrintScanner : IPrinter, IScanner
     {
-        public void Print(string path)
+        private readonly Device device;
+
+        public PrintScanner(Device device)
         {
-            Console.WriteLine($"Printing .....{path}");
+            this.device = device;
         }
 
-        public void Scan(string path)
-        {
-            Console.WriteLine($"Scanning .....{path}");
-        }
+        public void Print(string path) => device.Operation("Printing", path);
+
+        public void Scan(string path) => device.Operation("Scanning", path);
     }
 
     public static class TaskManager
     {
-        public static void ExecutePrintTask(IPrinter printer, string documentPath)
-        {
-            printer.Print(documentPath);
-        }
+        public static void ExecutePrintTask(IPrinter printer, string documentPath) => printer.Print(documentPath);
 
-        public static void ExecuteScanTask(IScanner scanner, string documentPath)
-        {
-            scanner.Scan(documentPath);
-        }
+        public static void ExecuteScanTask(IScanner scanner, string documentPath) => scanner.Scan(documentPath);
     }
 
     public class Program
     {
         static void Main()
         {
-            Printer printerObj = new Printer();
-            Scanner scannerObj = new Scanner();
-            PrintScanner printScannerObj = new PrintScanner();
+            Device commonDevice = new Device();
+
+            Printer printerObj = new Printer(commonDevice);
+            Scanner scannerObj = new Scanner(commonDevice);
+            PrintScanner printScannerObj = new PrintScanner(commonDevice);
 
             TaskManager.ExecutePrintTask(printerObj, "Test.doc");
             TaskManager.ExecuteScanTask(scannerObj, "MyImage.png");
 
             TaskManager.ExecutePrintTask(printScannerObj, "NewDoc.doc");
             TaskManager.ExecuteScanTask(printScannerObj, "YourImage.png");
-            Console.ReadLine();
         }
     }
 }
